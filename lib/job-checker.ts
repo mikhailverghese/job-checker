@@ -67,10 +67,14 @@ export async function getMeta() {
 }
 
 export async function findJob(jobId: string): Promise<Job | undefined> {
+  const target = String(jobId || '').trim();
+  const normalized = target.replace(/^linkedin:/, '');
   const jobs = await getJobs();
   return jobs.find((job) => {
+    const id = String(job.id ?? '').trim();
     const composite = `${job.source ?? 'unknown'}:${job.job_id ?? 'unknown'}`;
-    return (job.id ?? '').trim() === jobId || composite === jobId;
+    const rawJobId = String(job.job_id ?? '').trim();
+    return id === target || composite === target || rawJobId === target || rawJobId === normalized || id === `linkedin:${normalized}`;
   });
 }
 

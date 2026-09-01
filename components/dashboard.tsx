@@ -71,7 +71,7 @@ export default function Dashboard({ initialJobs, initialApplicants, initialMeta 
       setApplicantNote('Select an applicant profile before running cover letter actions.');
       return;
     }
-    const uniqueJobId = `${job.source || 'unknown'}:${job.job_id || 'unknown'}`;
+    const uniqueJobId = job.id || `${job.source || 'unknown'}:${job.job_id || 'unknown'}`;
     if (coverLetterStatus[uniqueJobId]?.status === 'generating') return;
     setCoverLetterStatus((current) => ({ ...current, [uniqueJobId]: { status: 'generating' } }));
     setApplicantNote(`Generating cover letter for ${uniqueJobId}...`);
@@ -157,7 +157,7 @@ export default function Dashboard({ initialJobs, initialApplicants, initialMeta 
         </div>
         <div className="jobs-grid">
           {filteredJobs.map((job) => {
-            const uniqueJobId = `${job.source || 'unknown'}:${job.job_id || 'unknown'}`;
+            const uniqueJobId = job.id || `${job.source || 'unknown'}:${job.job_id || 'unknown'}`;
             const coverState = coverLetterStatus[uniqueJobId];
             const isGenerating = coverState?.status === 'generating';
             const isReady = coverState?.status === 'ready';
