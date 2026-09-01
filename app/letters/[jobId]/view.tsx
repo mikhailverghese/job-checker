@@ -47,7 +47,7 @@ export default function LetterView({ jobId, applicantId, jobTitle, company }: { 
     doc.setFont('times', 'normal');
     doc.setFontSize(12);
     const lineHeight = 16.5;
-    const paragraphSpacing = 8;
+    const paragraphSpacing = 10;
     const paragraphs = letter.text.split(/\n\n+/).map((part) => part.trim()).filter(Boolean);
 
     for (const paragraph of paragraphs) {
