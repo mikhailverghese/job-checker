@@ -1,6 +1,6 @@
 # Job Checker
 
-Public-facing repository for an automated job search dashboard, with the private runtime state kept out of git.
+Public-facing repository for an automated job search workflow and dashboard. It combines LinkedIn scraping, weighted job scoring, public-safe data export, and cover letter generation while keeping private runtime state out of git.
 
 ## Setup
 
@@ -8,7 +8,7 @@ Public-facing repository for an automated job search dashboard, with the private
    ```bash
    cp config/config.example.json config/config.local.json
    ```
-2. Update the app to point at your local config, or copy values into your own untracked runtime config.
+2. Create your untracked runtime config if needed and keep it out of git.
 3. Set LinkedIn credentials:
    ```bash
    export LINKEDIN_EMAIL="you@example.com"
@@ -17,6 +17,9 @@ Public-facing repository for an automated job search dashboard, with the private
 4. Run the pipeline:
    ```bash
    source .venv/bin/activate
+   set -a
+   source .env
+   set +a
    python pipeline/job_checker.py
    ```
 
@@ -55,16 +58,16 @@ The dashboard reads the latest public-safe matched jobs export on each load and 
 - matched jobs
 - score
 - applicant count
-- matched positive/negative terms
+- matched positive and negative terms
 - LinkedIn save state
 
-The cover letter UI now uses an API-based text response instead of local PDF generation. The dashboard server includes a local `/api/cover-letter` implementation that uses a dedicated project OpenAI key and defaults to `gpt-4.1-mini`, matching the earlier n8n workflow more closely while avoiding local n8n, Playwright PDF generation, and subprocess execution.
+The cover letter UI uses an API-based text response. The dashboard server includes a local `/api/cover-letter` implementation that uses a dedicated project OpenAI key and defaults to `gpt-4.1-mini`, matching the earlier n8n workflow more closely while avoiding local n8n, Playwright PDF generation, and subprocess execution.
 
 ## Repository structure
 
-- `pipeline/` - private ingestion and scoring logic source
-- `dashboard/` - public-facing dashboard app layer
-- `data-public/` - public-facing derived JSON files for the dashboard
+- `pipeline/` - scraping, filtering, scoring, and public data export logic
+- `dashboard/` - public-facing dashboard app layer and cover letter API
+- `data-public/` - public-safe derived JSON files for the dashboard
 - `applicant/` - intentionally public candidate profile data
 - `config/` - example configuration only
 
@@ -80,9 +83,9 @@ Kept public on purpose:
 
 Not committed:
 - real environment variables
-- browser session/profile data
-- debug HTML/screenshots
-- generated outputs
+- browser session and profile data
+- debug HTML and screenshots
+- generated local outputs
 - local runtime state
 
 If you run this locally, keep your real credentials and browser state out of git.
