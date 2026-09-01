@@ -2,26 +2,68 @@
 
 Public-facing repository for an automated job search workflow and dashboard. It combines LinkedIn scraping, weighted job scoring, public-safe data export, and cover letter generation while keeping private runtime state out of git.
 
+## What changed
+
+The public dashboard now runs as a Next.js app that is ready for local development or Vercel deployment. The private pipeline code remains in place and continues to write the public-safe JSON files that power the UI.
+
 ## Setup
 
-1. Create a real config from the example:
-   ```bash
-   cp config/config.example.json config/config.local.json
-   ```
-2. Create your untracked runtime config if needed and keep it out of git.
-3. Set LinkedIn credentials:
-   ```bash
-   export LINKEDIN_EMAIL="you@example.com"
-   export LINKEDIN_PASSWORD="your-password"
-   ```
-4. Run the pipeline:
-   ```bash
-   source .venv/bin/activate
-   set -a
-   source .env
-   set +a
-   python pipeline/job_checker.py
-   ```
+### 1) Python pipeline setup
+
+Create and use the existing Python environment for scraping and export generation:
+
+```bash
+source .venv/bin/activate
+set -a
+source .env
+set +a
+python pipeline/job_checker.py
+```
+
+This refreshes the public dashboard inputs in `data-public/`.
+
+### 2) Dashboard app setup
+
+Install the Next.js app dependencies:
+
+```bash
+npm install
+```
+
+Run the dashboard locally:
+
+```bash
+npm run dev
+```
+
+Default local URL:
+
+```bash
+http://localhost:3000
+```
+
+Production build check:
+
+```bash
+npm run build
+npm start
+```
+
+## Vercel deployment
+
+This repo is structured so Vercel can deploy the dashboard directly.
+
+Recommended project settings:
+- Framework preset: Next.js
+- Root directory: repository root
+- Install command: `npm install`
+- Build command: `npm run build`
+
+Required environment variables for cover letter generation:
+- `JOB_CHECKER_OPENAI_API_KEY`
+- `JOB_CHECKER_OPENAI_MODEL` (optional, defaults to `gpt-4.1-mini`)
+
+If the OpenAI key is missing or the API call fails, the app falls back to a template-based cover letter.
 
 ## Output
 
@@ -36,40 +78,43 @@ Public-safe exported dashboard data:
 - `data-public/applicants.json`
 - `data-public/meta.json`
 
-## Dashboard
+## Dashboard app behavior
 
-Serve the latest matched jobs snapshot locally:
-
-```bash
-source .venv/bin/activate
-set -a
-source .env
-set +a
-python dashboard/server.py
-```
-
-Default URL:
-
-```bash
-http://<server-ip>:8787
-```
-
-The dashboard reads the latest public-safe matched jobs export on each load and shows:
+The Next.js dashboard reads the latest public-safe matched jobs export and shows:
 - matched jobs
 - score
-- applicant count
+- applicant selection
 - matched positive and negative terms
-- LinkedIn save state
+- LinkedIn save state metadata already present in the exported JSON
 
-The cover letter UI uses an API-based text response. The dashboard server includes a local `/api/cover-letter` implementation that uses a dedicated project OpenAI key and defaults to `gpt-4.1-mini`, matching the earlier n8n workflow more closely while avoiding local n8n, Playwright PDF generation, and subprocess execution.
+The app exposes Vercel-friendly API routes for:
+- `GET /api/jobs`
+- `GET /api/meta`
+- `GET /api/applicants`
+- `POST /api/cover-letter`
+
+`POST /api/cover-letter` mirrors the old dashboard behavior by reading:
+- `data-public/matched-jobs.json`
+- `applicant/*.json`
+
+and using:
+- `JOB_CHECKER_OPENAI_API_KEY`
+- `JOB_CHECKER_OPENAI_MODEL`
 
 ## Repository structure
 
+- `app/` - Next.js app router pages and API routes
+- `components/` - client dashboard UI
+- `lib/` - shared server-side data and cover letter helpers
 - `pipeline/` - scraping, filtering, scoring, and public data export logic
-- `dashboard/` - public-facing dashboard app layer and cover letter API
+- `dashboard/` - legacy static dashboard assets and local Python server
 - `data-public/` - public-safe derived JSON files for the dashboard
 - `applicant/` - intentionally public candidate profile data
 - `config/` - example configuration only
+
+## Legacy dashboard note
+
+`dashboard/server.py` is still present for reference, but the Next.js app is now the primary public dashboard path.
 
 ## Public repo notes
 
@@ -77,6 +122,7 @@ This repository is intended to be safe for public sharing.
 
 Kept public on purpose:
 - pipeline and dashboard source code
+- Next.js app source code
 - public candidate example/profile data
 - example and reference config
 - public dashboard metadata/data format files
