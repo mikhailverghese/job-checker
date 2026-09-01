@@ -1,11 +1,12 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import type { Job } from '@/lib/job-checker';
 
 type ApplicantOption = { id: string; filename: string; label: string };
 type Meta = { lastUpdated: string; totalRuntimeSeconds: number | null; matchedJobsCount: number | null };
-type CoverLetterState = { status: 'generating' | 'ready'; text?: string };
+type CoverLetterState = { status: 'generating' | 'ready'; text?: string; href?: string };
 
 function n(v?: number) { return typeof v === 'number' ? v : 0; }
 function salaryNumber(value?: string | null) { const digits = String(value || '').replace(/[^\d]/g, ''); return digits ? Number(digits) : null; }
@@ -36,7 +37,6 @@ export default function Dashboard({ initialJobs, initialApplicants, initialMeta 
     initialApplicants.length ? `Loaded ${initialApplicants.length} applicant profile${initialApplicants.length === 1 ? '' : 's'}.` : 'Add applicant JSON files under applicant/ to enable applicant selection.',
   );
   const [coverLetterStatus, setCoverLetterStatus] = useState<Record<string, CoverLetterState>>({});
-  const [selectedCoverLetter, setSelectedCoverLetter] = useState<{ jobTitle: string; text: string } | null>(null);
 
   useEffect(() => {
     const refresh = async () => {
@@ -84,8 +84,8 @@ export default function Dashboard({ initialJobs, initialApplicants, initialMeta 
       });
       const payload = await res.json();
       if (!res.ok || !payload.ok) throw new Error(payload.error || 'Cover letter trigger failed');
-      setCoverLetterStatus((current) => ({ ...current, [uniqueJobId]: { status: 'ready', text: payload.coverLetter } }));
-      setSelectedCoverLetter({ jobTitle: job.title || uniqueJobId, text: payload.coverLetter || '' });
+      const href = `/letters/${encodeURIComponent(uniqueJobId)}?applicant=${encodeURIComponent(applicants.find((applicant) => applicant.id === applicantId)?.label || applicantId)}&text=${encodeURIComponent(payload.coverLetter || '')}`;
+      setCoverLetterStatus((current) => ({ ...current, [uniqueJobId]: { status: 'ready', text: payload.coverLetter, href } }));
       setApplicantNote(`Cover letter ready for ${payload.jobId || uniqueJobId}.`);
     } catch (error) {
       setCoverLetterStatus((current) => {
@@ -119,18 +119,6 @@ export default function Dashboard({ initialJobs, initialApplicants, initialMeta 
           </select>
         </div>
         <div className="applicant-note">{applicantNote}</div>
-        {selectedCoverLetter?.text ? (
-          <div className="cover-letter-panel">
-            <div className="cover-letter-panel-header">
-              <div className="cover-letter-panel-title">Generated cover letter for {selectedCoverLetter.jobTitle}</div>
-              <button className="cover-letter-copy" type="button" disabled={!selectedCoverLetter.text} onClick={async () => {
-                await navigator.clipboard.writeText(selectedCoverLetter.text);
-                setApplicantNote('Cover letter copied to clipboard.');
-              }}>Copy</button>
-            </div>
-            <div className="cover-letter-content">{selectedCoverLetter.text}</div>
-          </div>
-        ) : null}
       </section>
 
       <section className="card">
@@ -185,9 +173,15 @@ export default function Dashboard({ initialJobs, initialApplicants, initialMeta 
                 <div className="job-footer">
                   <div>{job.application_type === 'Easy Apply' ? <span className="easy-apply">⚡ Easy Apply</span> : null}</div>
                   <div className="source-wrap">
-                    <button className={`cover-letter-button${isGenerating ? ' is-disabled' : ''}`} type="button" disabled={isGenerating} onClick={() => triggerCoverLetter(job)}>
-                      {isGenerating ? 'Generating...' : isReady ? 'Regenerate Letter' : 'Generate Letter'}
-                    </button>
+                    {isReady && coverState?.href ? (
+                      <Link className="cover-letter-button" href={coverState.href} target="_blank" rel="noreferrer">
+                        View Letter
+                      </Link>
+                    ) : (
+                      <button className={`cover-letter-button${isGenerating ? ' is-disabled' : ''}`} type="button" disabled={isGenerating} onClick={() => triggerCoverLetter(job)}>
+                        {isGenerating ? 'Generating...' : 'Generate Letter'}
+                      </button>
+                    )}
                     <span className="source-badge">{job.source || 'unknown'}</span>
                   </div>
                 </div>
