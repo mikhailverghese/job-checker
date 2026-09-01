@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { storeCoverLetter } from '@/lib/cover-letter-storage';
 import type { Job } from '@/lib/job-checker';
@@ -184,9 +183,13 @@ export default function Dashboard({ initialJobs, initialApplicants, initialMeta 
                   <div>{job.application_type === 'Easy Apply' ? <span className="easy-apply">⚡ Easy Apply</span> : null}</div>
                   <div className="source-wrap">
                     {isReady && coverState?.href ? (
-                      <Link className="cover-letter-button" href={coverState.href} target="_blank" rel="noreferrer">
+                      <button
+                        className="cover-letter-button"
+                        type="button"
+                        onClick={() => window.open(coverState.href, '_blank', 'noopener')}
+                      >
                         View Letter
-                      </Link>
+                      </button>
                     ) : (
                       <button className={`cover-letter-button${isGenerating ? ' is-disabled' : ''}`} type="button" disabled={isGenerating} onClick={() => triggerCoverLetter(job)}>
                         {isGenerating ? 'Generating...' : 'Generate Letter'}
