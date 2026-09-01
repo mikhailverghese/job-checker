@@ -41,7 +41,6 @@ export default function LetterView({ jobId, applicantId, jobTitle, company }: { 
       title: `Cover Letter - ${jobTitle}`,
       subject: `Cover letter for ${jobTitle} at ${company}`,
       author,
-      creator: 'job-checker',
       keywords: 'cover letter, job application',
     });
 
