@@ -25,6 +25,10 @@ src/__pycache__/
 config/local*.json
 config/*.local.json
 
+# Node / Next.js
+node_modules/
+.next/
+
 # OS/editor noise
 .DS_Store
 Thumbs.db
