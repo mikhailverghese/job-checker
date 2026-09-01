@@ -59,7 +59,7 @@ export default function LetterView({ jobId, applicantId, jobTitle, company }: { 
       y += paragraphHeight + 12;
     }
 
-    const filename = `${slugify(author)}-cover-letter-${slugify(company)}-${slugify(jobTitle)}.pdf`;
+    const filename = `cover_letter_${slugify(company)}.pdf`;
     doc.save(filename);
   }
 
