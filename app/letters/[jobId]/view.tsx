@@ -27,6 +27,7 @@ export default function LetterView({ jobId, applicantId, jobTitle, company }: { 
   function downloadPdf() {
     if (!letter?.text) return;
 
+    const author = (applicantLabel || 'Applicant').trim();
     const doc = new jsPDF({ unit: 'pt', format: 'letter' });
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
@@ -36,17 +37,15 @@ export default function LetterView({ jobId, applicantId, jobTitle, company }: { 
     const contentWidth = pageWidth - marginX * 2;
     let y = topMargin;
 
-    doc.setFont('times', 'bold');
-    doc.setFontSize(18);
-    const headerLines = doc.splitTextToSize(jobTitle, contentWidth);
-    doc.text(headerLines, marginX, y);
-    y += headerLines.length * 22;
+    doc.setDocumentProperties({
+      title: `Cover Letter - ${jobTitle}`,
+      subject: `Cover letter for ${jobTitle} at ${company}`,
+      author,
+      creator: 'job-checker',
+      keywords: 'cover letter, job application',
+    });
 
     doc.setFont('times', 'normal');
-    doc.setFontSize(11);
-    doc.text(`${company}${applicantLabel ? ` • ${applicantLabel}` : ''}`, marginX, y);
-    y += 28;
-
     doc.setFontSize(12);
     const paragraphs = letter.text.split(/\n\n+/).map((part) => part.trim()).filter(Boolean);
 
@@ -61,7 +60,7 @@ export default function LetterView({ jobId, applicantId, jobTitle, company }: { 
       y += paragraphHeight + 12;
     }
 
-    const filename = `${slugify(applicantLabel || 'applicant')}-cover-letter-${slugify(company)}-${slugify(jobTitle)}.pdf`;
+    const filename = `${slugify(author)}-cover-letter-${slugify(company)}-${slugify(jobTitle)}.pdf`;
     doc.save(filename);
   }
 
