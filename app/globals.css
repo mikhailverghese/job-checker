@@ -242,6 +242,12 @@ input, select, button {
   font-family: 'Georgia', 'Times New Roman', serif;
 }
 
+.letter-empty-state {
+  color: var(--muted);
+  line-height: 1.7;
+  font-size: 0.98rem;
+}
+
 @media (max-width: 1080px) {
   .filters, .jobs-grid, .hero-stats { grid-template-columns: 1fr; }
 }

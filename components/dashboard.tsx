@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
+import { storeCoverLetter } from '@/lib/cover-letter-storage';
 import type { Job } from '@/lib/job-checker';
 
 type ApplicantOption = { id: string; filename: string; label: string };
@@ -84,7 +85,16 @@ export default function Dashboard({ initialJobs, initialApplicants, initialMeta 
       });
       const payload = await res.json();
       if (!res.ok || !payload.ok) throw new Error(payload.error || 'Cover letter trigger failed');
-      const href = `/letters/${encodeURIComponent(uniqueJobId)}?applicant=${encodeURIComponent(applicants.find((applicant) => applicant.id === applicantId)?.label || applicantId)}&text=${encodeURIComponent(payload.coverLetter || '')}`;
+      const applicantLabel = applicants.find((applicant) => applicant.id === applicantId)?.label || applicantId;
+      storeCoverLetter(uniqueJobId, applicantId, {
+        text: payload.coverLetter || '',
+        applicantId,
+        applicantLabel,
+        jobTitle: job.title || uniqueJobId,
+        company: job.company || 'Unknown company',
+        generatedAt: payload.generatedAt || new Date().toISOString(),
+      });
+      const href = `/letters/${encodeURIComponent(uniqueJobId)}?applicantId=${encodeURIComponent(applicantId)}`;
       setCoverLetterStatus((current) => ({ ...current, [uniqueJobId]: { status: 'ready', text: payload.coverLetter, href } }));
       setApplicantNote(`Cover letter ready for ${payload.jobId || uniqueJobId}.`);
     } catch (error) {

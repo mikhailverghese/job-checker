@@ -1,5 +1,5 @@
-import { notFound } from 'next/navigation';
 import { findJob } from '@/lib/job-checker';
+import LetterView from './view';
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -17,33 +17,21 @@ export default async function LetterPage({ params, searchParams }: LetterPagePro
     params,
     searchParams ?? Promise.resolve({} as SearchParams),
   ]);
-  const text = first(resolvedSearchParams.text)?.trim() || '';
-  const applicant = first(resolvedSearchParams.applicant)?.trim() || '';
-  const job = await findJob(decodeURIComponent(jobId));
+  const applicantId = first(resolvedSearchParams.applicantId)?.trim() || '';
+  const decodedJobId = decodeURIComponent(jobId);
+  const job = await findJob(decodedJobId);
 
-  if (!job || !text) notFound();
+  if (!job) {
+    return (
+      <main className="page-shell letter-page-shell">
+        <section className="card letter-page-card">
+          <div className="eyebrow">Cover letter</div>
+          <h1>Letter unavailable</h1>
+          <p className="lede">That job could not be found in the current public dataset.</p>
+        </section>
+      </main>
+    );
+  }
 
-  const title = job.title || 'Cover letter';
-  const company = job.company || 'Unknown company';
-
-  return (
-    <main className="page-shell letter-page-shell">
-      <section className="card letter-page-card">
-        <div className="eyebrow">Cover letter</div>
-        <h1>{title}</h1>
-        <p className="lede">{company}{applicant ? ` • ${applicant}` : ''}</p>
-        <div className="letter-page-actions">
-          <button type="button" className="cover-letter-button" onClick={() => window.print()}>
-            Save as PDF
-          </button>
-          <a className="cover-letter-button secondary-button" href="/">
-            Back to dashboard
-          </a>
-        </div>
-        <article className="letter-document">
-          <pre className="letter-document-body">{text}</pre>
-        </article>
-      </section>
-    </main>
-  );
+  return <LetterView jobId={decodedJobId} applicantId={applicantId} jobTitle={job.title || 'Cover letter'} company={job.company || 'Unknown company'} />;
 }
