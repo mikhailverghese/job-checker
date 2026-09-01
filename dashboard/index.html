@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#182033" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Job Checker" />
+    <title>Job Checker Dashboard</title>
+    <style>
+      :root {
+        --bg: #0c1220;
+        --panel: rgba(19, 27, 43, 0.82);
+        --panel-strong: rgba(14, 20, 34, 0.9);
+        --text: #eef3ff;
+        --muted: #9fb0d1;
+        --line: rgba(159, 176, 209, 0.16);
+        --accent: #7ea2ff;
+        --accent-2: #71d2b2;
+        --warm: #f3b46f;
+        --danger: #ff8d8d;
+        --shadow: 0 18px 45px rgba(3, 8, 18, 0.35);
+      }
+
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at top left, rgba(126, 162, 255, 0.15), transparent 26%),
+          radial-gradient(circle at top right, rgba(113, 210, 178, 0.12), transparent 22%),
+          linear-gradient(180deg, #0f1730 0%, var(--bg) 100%);
+      }
+
+      .page-shell {
+        max-width: 1380px;
+        margin: 0 auto;
+        padding: 30px 20px 52px;
+      }
+
+      .card {
+        background: var(--panel);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(16px);
+        border-radius: 24px;
+      }
+
+      .hero {
+        padding: 32px;
+        margin-bottom: 22px;
+        background:
+          linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01)),
+          linear-gradient(90deg, rgba(126, 162, 255, 0.1), rgba(113, 210, 178, 0.08));
+      }
+
+      .eyebrow, .label {
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        font-size: 0.72rem;
+        font-weight: 700;
+      }
+
+      .eyebrow, .label { color: var(--accent); }
+
+      .hero h1 {
+        margin: 12px 0 0;
+        max-width: 860px;
+        font-size: clamp(2rem, 4vw, 3.5rem);
+        line-height: 1.04;
+        font-family: Georgia, "Times New Roman", serif;
+      }
+
+      .lede {
+        max-width: 760px;
+        margin: 16px 0 0;
+        color: var(--muted);
+        font-size: 1.03rem;
+        line-height: 1.65;
+      }
+
+      .hero-stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 24px;
+      }
+
+      .hero-stats div {
+        padding: 16px 18px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--line);
+      }
+
+      .hero-stats strong {
+        display: block;
+        margin-top: 8px;
+        font-size: 1.5rem;
+      }
+
+      .hero-meta {
+        margin-top: 16px;
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        gap: 20px;
+      }
+
+      .applicant-card {
+        padding: 24px;
+        margin-bottom: 22px;
+      }
+
+      .applicant-picker {
+        max-width: 360px;
+        margin-top: 14px;
+      }
+
+      .applicant-note {
+        margin-top: 10px;
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      .span-12 { grid-column: span 12; }
+
+      section.card, aside.card { padding: 24px; }
+
+      .section-head {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 18px;
+      }
+
+      .section-head h2, .section-head h3 {
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+      }
+
+      .section-head h2 {
+        font-size: clamp(1.35rem, 2vw, 2rem);
+      }
+
+      .filters {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      input, select {
+        width: 100%;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid var(--line);
+        color: var(--text);
+        border-radius: 14px;
+        padding: 12px 14px;
+        font: inherit;
+      }
+
+      .jobs-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+        margin-top: 18px;
+      }
+
+      .job-card {
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        background: rgba(255,255,255,0.04);
+        padding: 18px;
+      }
+
+      .job-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .job-id-label {
+        margin-bottom: 8px;
+        color: var(--muted);
+        font-size: 0.78rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .job-title {
+        margin: 0;
+        font-size: 1.08rem;
+        line-height: 1.35;
+      }
+
+      .job-title a {
+        color: var(--text);
+        text-decoration: none;
+      }
+
+      .job-title a:hover {
+        color: var(--accent);
+      }
+
+      .company {
+        margin-top: 6px;
+        font-weight: 600;
+      }
+
+      .meta {
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 0.94rem;
+      }
+
+      .meta.location-positive {
+        color: var(--accent-2);
+      }
+
+      .meta.location-negative {
+        color: var(--danger);
+      }
+
+      .job-side {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 8px;
+        flex-shrink: 0;
+      }
+
+      .score-pill {
+        border-radius: 999px;
+        border: 1px solid rgba(126, 162, 255, 0.2);
+        color: var(--accent);
+        background: rgba(126, 162, 255, 0.08);
+        padding: 8px 12px;
+        font-weight: 700;
+      }
+
+      .posted-time {
+        color: var(--muted);
+        font-size: 0.86rem;
+      }
+
+      .job-stats {
+        display: grid;
+        gap: 8px;
+        margin-top: 14px;
+      }
+
+      .job-descriptor {
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      .job-descriptor strong {
+        color: var(--text);
+      }
+
+      .signals {
+        margin-top: 16px;
+      }
+
+      .signals h4 {
+        margin: 0 0 8px;
+        font-size: 0.84rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 10px;
+        margin: 3px 6px 3px 0;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: rgba(255,255,255,0.05);
+        font-size: 0.82rem;
+      }
+
+      .tag.neg {
+        border-color: rgba(255, 141, 141, 0.25);
+        color: #ffc2c2;
+      }
+
+      .job-footer {
+        margin-top: 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .easy-apply {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--accent-2);
+        font-weight: 700;
+      }
+
+      .source-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 8px;
+      }
+
+      .cover-letter-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(126, 162, 255, 0.24);
+        background: rgba(126, 162, 255, 0.1);
+        color: var(--text);
+        text-decoration: none;
+        font-size: 0.8rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+      }
+
+      .cover-letter-button:hover {
+        background: rgba(126, 162, 255, 0.18);
+        border-color: rgba(126, 162, 255, 0.4);
+        color: #ffffff;
+      }
+
+      .cover-letter-button.is-disabled,
+      .cover-letter-button.is-disabled:hover {
+        background: rgba(159, 176, 209, 0.08);
+        border-color: rgba(159, 176, 209, 0.14);
+        color: rgba(215, 222, 235, 0.55);
+        cursor: not-allowed;
+        pointer-events: none;
+      }
+
+      .source-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(201, 208, 224, 0.28);
+        background: linear-gradient(180deg, rgba(205, 212, 224, 0.22), rgba(137, 147, 166, 0.16));
+        color: #d7deeb;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+
+      .muted { color: var(--muted); }
+
+      .sidebar-list {
+        display: grid;
+        gap: 12px;
+      }
+
+      .mini-card {
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 14px;
+        background: rgba(255,255,255,0.04);
+      }
+
+      .mini-card strong {
+        display: block;
+        margin-top: 6px;
+      }
+
+      .footer-note {
+        margin-top: 14px;
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      .cover-letter-panel {
+        margin-top: 14px;
+        padding: 14px;
+        border-radius: 16px;
+        border: 1px solid var(--line);
+        background: rgba(255,255,255,0.04);
+      }
+
+      .cover-letter-panel[hidden] {
+        display: none;
+      }
+
+      .cover-letter-panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 10px;
+      }
+
+      .cover-letter-panel-title {
+        font-size: 0.84rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .cover-letter-copy {
+        border: 1px solid rgba(126, 162, 255, 0.24);
+        background: rgba(126, 162, 255, 0.1);
+        color: var(--text);
+        border-radius: 999px;
+        padding: 8px 12px;
+        font: inherit;
+        font-size: 0.8rem;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .cover-letter-copy:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .cover-letter-content {
+        white-space: pre-wrap;
+        color: var(--text);
+        line-height: 1.65;
+        font-size: 0.95rem;
+      }
+
+      @media (max-width: 1080px) {
+        .filters { grid-template-columns: 1fr; }
+        .hero-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .jobs-grid { grid-template-columns: 1fr; }
+      }
+
+      @media (max-width: 720px) {
+        .hero-stats { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page-shell">
+      <section class="card hero">
+        <div class="eyebrow">Job search snapshot</div>
+        <h1>Weighted job matches in one place.</h1>
+        <p class="lede">
+          This dashboard shows the latest matched jobs from the job-checker pipeline, with skill-based scoring.
+        </p>
+        <div class="hero-stats" id="heroStats"></div>
+        <div class="hero-meta" id="heroMeta">Loading latest snapshot…</div>
+      </section>
+
+      <section class="card applicant-card">
+        <div class="label">Applicant selection</div>
+        <h2 style="margin: 10px 0 0; font-family: Georgia, 'Times New Roman', serif;">Choose the applicant profile</h2>
+        <div class="applicant-picker">
+          <select id="applicantSelect">
+            <option value="">Loading applicants…</option>
+          </select>
+        </div>
+        <div class="applicant-note" id="applicantNote">Select which applicant profile should be used for cover-letter actions.</div>
+        <div class="cover-letter-panel" id="coverLetterPanel" hidden>
+          <div class="cover-letter-panel-header">
+            <div class="cover-letter-panel-title" id="coverLetterTitle">Generated cover letter</div>
+            <button class="cover-letter-copy" id="copyCoverLetterButton" type="button">Copy</button>
+          </div>
+          <div class="cover-letter-content" id="coverLetterContent"></div>
+        </div>
+      </section>
+
+      <div class="grid">
+        <section class="card span-12">
+          <div class="section-head">
+            <div>
+              <div class="label">Matched roles</div>
+              <h2>Latest dashboard view</h2>
+            </div>
+          </div>
+
+          <div class="filters">
+            <select id="minScore"></select>
+            <select id="salaryFilter"></select>
+            <select id="locationFilter"></select>
+          </div>
+
+          <div class="jobs-grid" id="jobsGrid"></div>
+          <div class="footer-note" id="summary"></div>
+        </section>
+
+      </div>
+    </div>
+
+    <script>
+      const state = {
+        jobs: [],
+        filtered: [],
+        coverLetterStatus: new Map(),
+        selectedCoverLetter: null,
+      };
+
+      const heroStats = document.getElementById('heroStats');
+      const heroMeta = document.getElementById('heroMeta');
+      const jobsGrid = document.getElementById('jobsGrid');
+      const summary = document.getElementById('summary');
+      const minScore = document.getElementById('minScore');
+      const salaryFilter = document.getElementById('salaryFilter');
+      const locationFilter = document.getElementById('locationFilter');
+      const applicantSelect = document.getElementById('applicantSelect');
+      const applicantNote = document.getElementById('applicantNote');
+      const coverLetterPanel = document.getElementById('coverLetterPanel');
+      const coverLetterTitle = document.getElementById('coverLetterTitle');
+      const coverLetterContent = document.getElementById('coverLetterContent');
+      const copyCoverLetterButton = document.getElementById('copyCoverLetterButton');
+
+      function n(v) { return typeof v === 'number' ? v : 0; }
+
+      function renderHeroStats() {
+        const total = state.jobs.length;
+        const avg = total ? (state.jobs.reduce((a, j) => a + n(j.score), 0) / total).toFixed(1) : '0.0';
+        const cards = [
+          ['Matched jobs', total],
+          ['Average score', avg],
+        ];
+
+        heroStats.innerHTML = cards.map(([label, value]) => `
+          <div>
+            <div class="muted">${label}</div>
+            <strong>${value}</strong>
+          </div>
+        `).join('');
+      }
+
+      function salaryNumber(value) {
+        if (!value) return null;
+        const digits = String(value).replace(/[^\d]/g, '');
+        return digits ? Number(digits) : null;
+      }
+
+      function renderFilterChoices() {
+        const maxScore = Math.max(0, ...state.jobs.map(j => n(j.score)));
+        minScore.innerHTML = '<option value="0">Min score: any</option>' +
+          Array.from({ length: maxScore + 1 }, (_, i) => i)
+            .map(v => `<option value="${v}">${v}+</option>`)
+            .join('');
+
+        salaryFilter.innerHTML = [
+          '<option value="">Any salary</option>',
+          '<option value="100000">$100k+</option>',
+          '<option value="125000">$125k+</option>',
+          '<option value="150000">$150k+</option>',
+          '<option value="175000">$175k+</option>',
+          '<option value="200000">$200k+</option>'
+        ].join('');
+        salaryFilter.value = '100000';
+
+        const locations = [...new Set(state.jobs.map(j => j.location).filter(Boolean))].sort();
+        locationFilter.innerHTML = '<option value="">All locations</option>' +
+          locations.map(location => `<option value="${location}">${location}</option>`).join('');
+      }
+
+      function applyFilters() {
+        const min = Number(minScore.value || 0);
+        const salaryMin = salaryFilter.value ? Number(salaryFilter.value) : null;
+        const location = locationFilter.value;
+
+        state.filtered = state.jobs.filter(job => {
+          if (n(job.score) < min) return false;
+          if (salaryMin !== null) {
+            const value = salaryNumber(job.salary);
+            if (value !== null && value < salaryMin) return false;
+          }
+          if (location && job.location !== location) return false;
+          return true;
+        }).sort((a, b) => n(b.score) - n(a.score));
+
+        renderJobs();
+      }
+
+      function renderTags(values, neg = false) {
+        if (!values || !values.length) return '<span class="muted">None</span>';
+        return values.map(v => `<span class="tag ${neg ? 'neg' : ''}">${v}</span>`).join('');
+      }
+
+      function formatRelativeTime(isoString) {
+        if (!isoString) return 'n/a';
+        const date = new Date(isoString);
+        if (Number.isNaN(date.getTime())) return 'n/a';
+        const diffMs = Date.now() - date.getTime();
+        if (diffMs < 0) return 'just now';
+        const minutes = Math.floor(diffMs / 60000);
+        const hours = Math.floor(diffMs / 3600000);
+        const days = Math.floor(diffMs / 86400000);
+        if (minutes < 1) return 'just now';
+        if (minutes < 60) return `${minutes} minute${minutes === 1 ? '' : 's'} ago`;
+        if (hours < 24) return `${hours} hour${hours === 1 ? '' : 's'} ago`;
+        return `${days} day${days === 1 ? '' : 's'} ago`;
+      }
+
+      function renderCoverLetterPanel() {
+        if (!state.selectedCoverLetter?.text) {
+          coverLetterPanel.hidden = true;
+          coverLetterTitle.textContent = 'Generated cover letter';
+          coverLetterContent.textContent = '';
+          copyCoverLetterButton.disabled = true;
+          return;
+        }
+
+        coverLetterPanel.hidden = false;
+        coverLetterTitle.textContent = `Generated cover letter for ${state.selectedCoverLetter.jobTitle}`;
+        coverLetterContent.textContent = state.selectedCoverLetter.text;
+        copyCoverLetterButton.disabled = false;
+      }
+
+      async function triggerCoverLetter(job) {
+        const applicantId = applicantSelect.value;
+        if (!applicantId) {
+          applicantNote.textContent = 'Select an applicant profile before running cover letter actions.';
+          return;
+        }
+
+        const uniqueJobId = `${job.source || 'unknown'}:${job.job_id || 'unknown'}`;
+        const currentStatus = state.coverLetterStatus.get(uniqueJobId);
+        if (currentStatus?.status === 'generating') {
+          return;
+        }
+
+        state.coverLetterStatus.set(uniqueJobId, { status: 'generating' });
+        renderJobs();
+        applicantNote.textContent = `Generating cover letter for ${uniqueJobId}...`;
+
+        try {
+          const res = await fetch('/api/cover-letter', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              jobId: uniqueJobId,
+              applicantId,
+            }),
+          });
+          const payload = await res.json();
+          if (!res.ok || !payload.ok) {
+            throw new Error(payload.error || 'Cover letter trigger failed');
+          }
+          state.coverLetterStatus.set(uniqueJobId, {
+            status: 'ready',
+            text: payload.coverLetter,
+          });
+          state.selectedCoverLetter = {
+            jobId: payload.jobId || uniqueJobId,
+            jobTitle: job.title || uniqueJobId,
+            text: payload.coverLetter || '',
+          };
+          renderJobs();
+          renderCoverLetterPanel();
+          applicantNote.textContent = `Cover letter ready for ${payload.jobId || uniqueJobId}.`;
+        } catch (error) {
+          state.coverLetterStatus.delete(uniqueJobId);
+          renderJobs();
+          applicantNote.textContent = `Cover letter trigger failed: ${error.message}`;
+        }
+      }
+
+      function renderJobs() {
+        jobsGrid.innerHTML = state.filtered.map(job => {
+          const uniqueJobId = `${job.source || 'unknown'}:${job.job_id || 'unknown'}`;
+          const coverLetterState = state.coverLetterStatus.get(uniqueJobId);
+          const isGenerating = coverLetterState?.status === 'generating';
+          const isReady = coverLetterState?.status === 'ready';
+          const buttonClass = isGenerating ? 'is-disabled' : '';
+          const buttonLabel = isGenerating ? 'Generating...' : (isReady ? 'Regenerate Letter' : 'Generate Letter');
+          const locationClass = job.location_signal === 'positive'
+            ? 'meta location-positive'
+            : job.location_signal === 'negative'
+              ? 'meta location-negative'
+              : 'meta';
+          return `
+          <article class="job-card">
+            <div class="job-top">
+              <div>
+                <div class="job-id-label">Job ID ${job.job_id || 'n/a'}</div>
+                <h3 class="job-title"><a href="${job.linkedin_url}" target="_blank" rel="noreferrer">${job.title || 'Untitled role'}</a></h3>
+                <div class="company">${job.company || 'Unknown company'}</div>
+                <div class="${locationClass}">${job.location || 'Unknown location'}</div>
+              </div>
+              <div class="job-side">
+                <div class="score-pill">Score ${n(job.score)}</div>
+                <div class="posted-time">${formatRelativeTime(job.posted_timestamp_estimate)}</div>
+              </div>
+            </div>
+
+            <div class="job-stats">
+              <div class="job-descriptor"><strong>Salary:</strong> ${job.salary || 'n/a'}</div>
+            </div>
+
+            <div class="signals">
+              <h4>Positive signals</h4>
+              <div>${renderTags(job.matched_positive_terms || [], false)}</div>
+            </div>
+
+            <div class="signals">
+              <h4>Negative signals</h4>
+              <div>${renderTags(job.matched_negative_terms || [], true)}</div>
+            </div>
+
+            <div class="job-footer">
+              <div>
+                ${job.application_type === 'Easy Apply' ? '<span class="easy-apply">⚡ Easy Apply</span>' : ''}
+              </div>
+              <div class="source-wrap">
+                <a class="cover-letter-button ${buttonClass}" href="#" data-job-id="${job.job_id || ''}" data-ready="${isReady ? 'true' : 'false'}">${buttonLabel}</a>
+                <span class="source-badge">${job.source || 'unknown'}</span>
+              </div>
+            </div>
+          </article>
+        `;
+        }).join('');
+
+        summary.textContent = `${state.filtered.length} of ${state.jobs.length} matched jobs shown.`;
+
+        jobsGrid.querySelectorAll('.cover-letter-button').forEach(button => {
+          button.addEventListener('click', event => {
+            event.preventDefault();
+            const jobId = button.getAttribute('data-job-id');
+            const job = state.filtered.find(item => String(item.job_id || '') === String(jobId || ''));
+            if (job) {
+              triggerCoverLetter(job);
+            }
+          });
+        });
+      }
+
+      async function loadApplicants() {
+        try {
+          const res = await fetch('./applicants.json', { cache: 'no-store' });
+          const applicants = res.ok ? await res.json() : [];
+          if (!applicants.length) {
+            applicantSelect.innerHTML = '<option value="">No applicant profiles found</option>';
+            applicantNote.textContent = 'Add applicant JSON files under applicant/ to enable applicant selection.';
+            return;
+          }
+          applicantSelect.innerHTML = applicants
+            .map(applicant => `<option value="${applicant.id}">${applicant.label}</option>`)
+            .join('');
+          applicantNote.textContent = `Loaded ${applicants.length} applicant profile${applicants.length === 1 ? '' : 's'}.`;
+        } catch (error) {
+          applicantSelect.innerHTML = '<option value="">Unable to load applicants</option>';
+          applicantNote.textContent = 'Applicant profiles could not be loaded right now.';
+        }
+      }
+
+      async function load() {
+        const [jobsRes, metaRes] = await Promise.all([
+          fetch('./matched-jobs.json', { cache: 'no-store' }),
+          fetch('./meta.json', { cache: 'no-store' }).catch(() => null),
+        ]);
+        state.jobs = await jobsRes.json();
+        renderHeroStats();
+        renderFilterChoices();
+        applyFilters();
+        await loadApplicants();
+
+        if (metaRes && metaRes.ok) {
+          const meta = await metaRes.json();
+          heroMeta.textContent = `Updated ${formatRelativeTime(meta.lastUpdated)}`;
+        } else {
+          heroMeta.textContent = 'Updated recently';
+        }
+      }
+
+      copyCoverLetterButton.addEventListener('click', async () => {
+        if (!state.selectedCoverLetter?.text) return;
+        await navigator.clipboard.writeText(state.selectedCoverLetter.text);
+        applicantNote.textContent = 'Cover letter copied to clipboard.';
+      });
+
+      [minScore, salaryFilter, locationFilter].forEach(el => el.addEventListener('input', applyFilters));
+      renderCoverLetterPanel();
+      load();
+      setInterval(() => {
+        if (state.filtered.length) renderJobs();
+      }, 60000);
+    </script>
+  </body>
+</html>
