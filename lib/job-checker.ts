@@ -56,14 +56,25 @@ export async function getApplicant(applicantId: string): Promise<Applicant> {
 }
 
 export async function getMeta() {
-  const jobsPath = path.join(PUBLIC_DATA_DIR, 'matched-jobs.json');
-  const stats = await fs.stat(jobsPath);
   const jobs = await getJobs();
-  return {
-    lastUpdated: stats.mtime.toISOString(),
-    totalRuntimeSeconds: null,
-    matchedJobsCount: jobs.length,
-  };
+  const fallbackMetaPath = path.join(PUBLIC_DATA_DIR, 'meta.json');
+  let lastUpdated = jobs[0]?.posted_timestamp_estimate || new Date().toISOString();
+
+  try {
+    const meta = await readJsonFile<{ lastUpdated?: string; matchedJobsCount?: number }>(fallbackMetaPath);
+    if (meta.lastUpdated) lastUpdated = meta.lastUpdated;
+    return {
+      lastUpdated,
+      totalRuntimeSeconds: null,
+      matchedJobsCount: typeof meta.matchedJobsCount === 'number' ? meta.matchedJobsCount : jobs.length,
+    };
+  } catch {
+    return {
+      lastUpdated,
+      totalRuntimeSeconds: null,
+      matchedJobsCount: jobs.length,
+    };
+  }
 }
 
 export async function findJob(jobId: string): Promise<Job | undefined> {
