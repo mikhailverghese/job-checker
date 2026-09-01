@@ -1,0 +1,17 @@
+.git/
+.gitignore
+.vercel/
+.venv/
+node_modules/
+browser-profile/
+output/
+data/
+__pycache__/
+*.pyc
+.env
+.env.*
+config/config.json
+scripts/
+dashboard/
+web/
+src/
