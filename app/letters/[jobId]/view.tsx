@@ -46,17 +46,19 @@ export default function LetterView({ jobId, applicantId, jobTitle, company }: { 
 
     doc.setFont('times', 'normal');
     doc.setFontSize(12);
+    const lineHeight = 16;
+    const paragraphSpacing = 4;
     const paragraphs = letter.text.split(/\n\n+/).map((part) => part.trim()).filter(Boolean);
 
     for (const paragraph of paragraphs) {
       const lines = doc.splitTextToSize(paragraph, contentWidth);
-      const paragraphHeight = lines.length * 18;
+      const paragraphHeight = lines.length * lineHeight;
       if (y + paragraphHeight > pageHeight - bottomMargin) {
         doc.addPage();
         y = topMargin;
       }
-      doc.text(lines, marginX, y, { baseline: 'top' });
-      y += paragraphHeight + 12;
+      doc.text(lines, marginX, y, { baseline: 'top', lineHeightFactor: lineHeight / 12 });
+      y += paragraphHeight + paragraphSpacing;
     }
 
     const filename = `cover_letter_${slugify(company)}.pdf`;
