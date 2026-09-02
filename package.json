@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "jspdf": "^4.2.1",
+    "motion": "^13.1.1",
     "next": "15.5.25",
     "openai": "^4.104.0",
     "react": "19.1.1",

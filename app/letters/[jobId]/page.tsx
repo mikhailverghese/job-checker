@@ -23,9 +23,12 @@ export default async function LetterPage({ params, searchParams }: LetterPagePro
 
   if (!job) {
     return (
-      <main className="page-shell letter-page-shell">
-        <section className="card letter-page-card">
-          <div className="eyebrow">Cover letter</div>
+      <main className="letter-shell">
+        <section className="letter-card">
+          <div className="eyebrow">
+            <span className="eyebrow-dot" aria-hidden />
+            Cover letter
+          </div>
           <h1>Letter unavailable</h1>
           <p className="lede">That job could not be found in the current public dataset.</p>
         </section>

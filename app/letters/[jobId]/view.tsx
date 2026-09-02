@@ -66,28 +66,37 @@ export default function LetterView({ jobId, applicantId, jobTitle, company }: { 
   }
 
   return (
-    <main className="page-shell letter-page-shell">
-      <section className="card letter-page-card">
-        <div className="eyebrow">Cover letter</div>
+    <main className="letter-shell">
+      <section className="letter-card">
+        <div className="eyebrow">
+          <span className="eyebrow-dot" aria-hidden />
+          Cover letter
+        </div>
         <h1>{jobTitle}</h1>
         <p className="lede">{company}{applicantLabel ? ` • ${applicantLabel}` : ''}</p>
-        <div className="letter-page-actions">
-          <button type="button" className="cover-letter-button" onClick={downloadPdf} disabled={!letter?.text}>
+        <div className="letter-actions">
+          <button type="button" className="btn btn-primary" onClick={downloadPdf} disabled={!letter?.text}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+              <path d="M12 3v11m0 0-4-4m4 4 4-4M4 21h16" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
             Download PDF
           </button>
-          <Link className="cover-letter-button secondary-button" href="/">
+          <Link className="btn" href="/">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+              <path d="M15 6l-6 6 6 6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
             Back to dashboard
           </Link>
         </div>
-        <article className="letter-document">
+        <article className="letter-doc">
           {letter?.text ? (
-            <pre className="letter-document-body">{letter.text}</pre>
+            <pre className="letter-doc-body">{letter.text}</pre>
           ) : loaded ? (
-            <div className="letter-empty-state">
+            <div className="letter-empty">
               This letter is not available in the current browser session. Generate it again from the dashboard, then click View Letter.
             </div>
           ) : (
-            <div className="letter-empty-state">Loading letter…</div>
+            <div className="letter-empty">Loading letter…</div>
           )}
         </article>
       </section>
