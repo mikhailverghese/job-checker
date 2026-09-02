@@ -1,0 +1,80 @@
+{
+  "search_terms": [
+    "Analytics Engineer",
+    "BI Engineer",
+    "BI Analyst",
+    "Data Analyst"
+  ],
+  "location_keywords": [
+    "new york, ny",
+    "new york city",
+    "nyc",
+    "new jersey",
+    "nj",
+    "jersey city",
+    "hoboken",
+    "newark",
+    "remote"
+  ],
+  "time_keywords": [
+    "24 hours",
+    "1 day",
+    "today",
+    "just now",
+    "hour",
+    "hours"
+  ],
+  "weights": {
+    "title_positive": {},
+    "title_negative": {
+      "snowflake": -5,
+      "software": -5
+    },
+    "location_positive": {
+      "piscataway": 3,
+      "new brunswick": 3,
+      "princeton": 3,
+      "rahway": 2,
+      "iselin": 2,
+      "edison": 2
+    },
+    "location_negative": {},
+    "positive": {
+      "python": 4,
+      "sql": 4,
+      "dbt": 3,
+      "snowflake": 0,
+      "bigquery": 3,
+      "google bigquery": 3,
+      "etl": 1,
+      "elt": 1,
+      "aws": 1,
+      "power bi": 2,
+      "cursor": 1,
+      "codex": 1
+    },
+    "negative": {
+      "kafka": -3,
+      "airflow": -3,
+      "spark": -3,
+      "databricks": -3,
+      "dax": -3,
+      "typescript": -3,
+      "javascript": -3,
+      "statistical": -2,
+      "forecast": -2,
+      "regression": -2,
+      "predictive": -2,
+      "machine learning": -2,
+      "clinical": -2,
+      "healthcare": -2,
+      "beaconfire": -12
+    }
+  },
+  "filters": {
+    "min_score": 4,
+    "min_positive_matches": 3,
+    "include_remote": true,
+    "no_negative_bonus": 4
+  }
+}

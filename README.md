@@ -110,11 +110,37 @@ and using:
 - `dashboard/` - legacy static dashboard assets and local Python server
 - `data-public/` - public-safe derived JSON files for the dashboard
 - `applicant/` - intentionally public candidate profile data
-- `config/` - example configuration only
+- `config/scoring-config.json` - public scoring logic, search targets, weights, and filters
+- `config/runtime.example.json` - example runtime/local-machine config
+- `config/runtime.local.json` - local runtime overrides, kept out of git
 
 ## Legacy dashboard note
 
 `dashboard/server.py` is still present for reference, but the Next.js app is now the primary public dashboard path.
+
+## Config split
+
+The repo now separates public scoring logic from private runtime details.
+
+Public and committed:
+- `config/scoring-config.json`
+  - search terms
+  - location/time keywords
+  - positive and negative weights
+  - filters and score thresholds
+
+Private and local-only:
+- `config/runtime.local.json`
+  - browser profile paths
+  - output/debug directories
+  - scraping runtime preferences
+  - other machine-specific settings
+
+To create a local runtime config, copy the example:
+
+```bash
+cp config/runtime.example.json config/runtime.local.json
+```
 
 ## Public repo notes
 
@@ -124,7 +150,7 @@ Kept public on purpose:
 - pipeline and dashboard source code
 - Next.js app source code
 - public candidate example/profile data
-- example and reference config
+- public scoring config and reference runtime example
 - public dashboard metadata/data format files
 
 Not committed:
@@ -140,7 +166,6 @@ If you run this locally, keep your real credentials and browser state out of git
 
 This version is tuned for:
 - Analytics Engineer
-- Data Engineer
 - BI Engineer
 - BI Analyst
 - Data Analyst

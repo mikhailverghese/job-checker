@@ -1,0 +1,33 @@
+{
+  "linkedin": {
+    "email_env": "LINKEDIN_EMAIL",
+    "password_env": "LINKEDIN_PASSWORD",
+    "headless": true,
+    "max_jobs_per_search": 50,
+    "slow_mo_ms": 0,
+    "geo_id": "106868843",
+    "distance": 50,
+    "time_range_seconds": 86400,
+    "auto_save_matched_jobs": true,
+    "auto_save_top_n": 8,
+    "use_persistent_profile": true,
+    "profile_dir": "browser-profile/imported",
+    "profile_name": "Profile 2"
+  },
+  "debug": {
+    "enabled": true,
+    "screenshots_dir": "output/debug/screenshots",
+    "html_dir": "output/debug/html",
+    "save_login_screenshot": true,
+    "save_search_screenshot": true,
+    "save_first_detail_screenshot": true,
+    "save_html_on_failure": true
+  },
+  "storage": {
+    "seen_jobs_path": "data/seen_jobs.json",
+    "use_persistent_seen_jobs": false,
+    "matched_jobs_json": "output/matched_jobs.json",
+    "matched_jobs_csv": "output/matched_jobs.csv",
+    "raw_jobs_json": "output/raw_jobs.json"
+  }
+}

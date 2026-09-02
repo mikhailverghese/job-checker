@@ -42,11 +42,15 @@ class JobPosting:
 
 
 class JobChecker:
-    def __init__(self, config_path: str = "config/config.json") -> None:
+    def __init__(
+        self,
+        scoring_config_path: str = "config/scoring-config.json",
+        runtime_config_path: str = "config/runtime.local.json",
+    ) -> None:
         self.root = Path(__file__).resolve().parent.parent
         self.public_data_dir = self.root / "data-public"
         self.public_matched_jobs_json = self.public_data_dir / "matched-jobs.json"
-        self.config = self._load_config(config_path)
+        self.config = self._load_config(scoring_config_path, runtime_config_path)
         self.storage = self.config["storage"]
         self.debug = self.config.get("debug", {})
         self.seen_jobs_path = self.root / self.storage["seen_jobs_path"]
@@ -60,11 +64,27 @@ class JobChecker:
         self.email = os.getenv(self.config["linkedin"]["email_env"])
         self.password = os.getenv(self.config["linkedin"]["password_env"])
 
-    def _load_config(self, config_path: str) -> dict[str, Any]:
+    def _deep_merge(self, base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any]:
+        result = dict(base)
+        for key, value in override.items():
+            if isinstance(value, dict) and isinstance(result.get(key), dict):
+                result[key] = self._deep_merge(result[key], value)
+            else:
+                result[key] = value
+        return result
+
+    def _load_json_config(self, config_path: str, required: bool = True) -> dict[str, Any]:
         path = self.root / config_path
         if not path.exists():
-            raise FileNotFoundError(f"Config file not found: {path}")
+            if required:
+                raise FileNotFoundError(f"Config file not found: {path}")
+            return {}
         return json.loads(path.read_text())
+
+    def _load_config(self, scoring_config_path: str, runtime_config_path: str) -> dict[str, Any]:
+        scoring = self._load_json_config(scoring_config_path, required=True)
+        runtime = self._load_json_config(runtime_config_path, required=False)
+        return self._deep_merge(scoring, runtime)
 
     def load_seen_jobs(self) -> set[str]:
         if not self.seen_jobs_path.exists():
