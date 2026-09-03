@@ -19,4 +19,5 @@ fi
 
 cd "$PROJECT_ROOT"
 ./run_job_checker.sh >> "$PROJECT_ROOT/output/cron.log" 2>&1
+./publish_public_data.sh >> "$PROJECT_ROOT/output/cron.log" 2>&1
 printf '%s\n' "$NY_DATE" > "$STAMP_FILE"

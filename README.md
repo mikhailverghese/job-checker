@@ -22,6 +22,8 @@ python pipeline/job_checker.py
 
 This refreshes the public dashboard inputs in `data-public/`.
 
+If you also want the live Vercel dashboard to update, the refreshed `data-public/*` files must be committed and pushed to GitHub, because the deployed app serves the repository snapshot rather than your local machine directly.
+
 ### 2) Dashboard app setup
 
 Install the Next.js app dependencies:
@@ -48,6 +50,18 @@ Production build check:
 npm run build
 npm start
 ```
+
+## Scheduled publishing
+
+The local cron flow can be configured to do more than scrape jobs.
+
+Current scheduled behavior:
+- run the Python pipeline during the 10 AM New York hour
+- refresh `data-public/matched-jobs.json`
+- refresh `data-public/meta.json`
+- automatically commit and push changed public export files via `publish_public_data.sh`
+
+That push is what allows Vercel to redeploy with fresh public data.
 
 ## Vercel deployment
 
