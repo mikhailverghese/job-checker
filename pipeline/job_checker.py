@@ -594,7 +594,10 @@ class JobChecker:
 
     def _parse_salary_amounts(self, salary_text: str) -> list[float]:
         salary_text = salary_text.replace('—', '-').replace('–', '-')
-        amounts = re.findall(r"\$?\s*([\d,]+(?:\.\d+)?)\s*([kKmM]?)", salary_text)
+        amounts = re.findall(
+            r"\$?\s*([\d,]+(?:\.\d+)?)(?:\s*([kKmM])(?![a-zA-Z]))?",
+            salary_text,
+        )
         values: list[float] = []
         for amount_text, suffix in amounts:
             cleaned = amount_text.replace(',', '').strip()
@@ -648,17 +651,17 @@ class JobChecker:
             search_spaces.insert(0, html)
 
         annual_patterns = [
-            (20, r"Base Salary:\s*(\$?\s*[\d,]+(?:\.\d+)?\s*[kKmM]?(?:\s*(?:-|–|—|to)\s*\$?\s*[\d,]+(?:\.\d+)?\s*[kKmM]?)?)"),
-            (18, r"base pay[:\s]+(\$?\s*[\d,]+(?:\.\d+)?\s*[kKmM]?(?:\s*(?:-|–|—|to)\s*\$?\s*[\d,]+(?:\.\d+)?\s*[kKmM]?)?)"),
-            (18, r"base pay range[^\d$]{0,120}(\$?\s*[\d,]+(?:\.\d+)?\s*[kKmM]?(?:\s*(?:-|–|—|to)\s*\$?\s*[\d,]+(?:\.\d+)?\s*[kKmM]?)?)"),
+            (20, r"Base Salary:\s*(\$?\s*[\d,]+(?:\.\d+)?(?:\s*[kKmM](?![a-zA-Z]))?(?:\s*(?:-|–|—|to)\s*\$?\s*[\d,]+(?:\.\d+)?(?:\s*[kKmM](?![a-zA-Z]))?)?)"),
+            (18, r"base pay[:\s]+(\$?\s*[\d,]+(?:\.\d+)?(?:\s*[kKmM](?![a-zA-Z]))?(?:\s*(?:-|–|—|to)\s*\$?\s*[\d,]+(?:\.\d+)?(?:\s*[kKmM](?![a-zA-Z]))?)?)"),
+            (18, r"base pay range[^\d$]{0,120}(\$?\s*[\d,]+(?:\.\d+)?(?:\s*[kKmM](?![a-zA-Z]))?(?:\s*(?:-|–|—|to)\s*\$?\s*[\d,]+(?:\.\d+)?(?:\s*[kKmM](?![a-zA-Z]))?)?)"),
             (17, r"Compensation Range:\s*(?:USD\s*)?(\$\s*[\d,]+(?:\.\d+)?\s*(?:-|–|—|to)\s*(?:USD\s*)?\$\s*[\d,]+(?:\.\d+)?(?:\s*/\s*(?:annually|annual|yr|year))?)"),
-            (16, r"Compensation Range:\s*(\$?\s*[\d,]+(?:\.\d+)?\s*[kKmM]?(?:\s*(?:-|–|—|to)\s*\$?\s*[\d,]+(?:\.\d+)?\s*[kKmM]?)?)"),
-            (15, r"estimated annual pay range[^\d]{0,80}(\$?\s*[\d,]+(?:\.\d+)?\s*[kKmM]?(?:\s*(?:-|–|—|to)\s*\$?\s*[\d,]+(?:\.\d+)?\s*[kKmM]?)?)"),
-            (15, r"annual pay range[^\d]{0,80}(\$?\s*[\d,]+(?:\.\d+)?\s*[kKmM]?(?:\s*(?:-|–|—|to)\s*\$?\s*[\d,]+(?:\.\d+)?\s*[kKmM]?)?)"),
-            (15, r"pay range for this position[^\d]{0,80}(\$?\s*[\d,]+(?:\.\d+)?\s*[kKmM]?(?:\s*(?:-|–|—|to)\s*\$?\s*[\d,]+(?:\.\d+)?\s*[kKmM]?)?)"),
-            (14, r"salary range[^\d]{0,80}(\$?\s*[\d,]+(?:\.\d+)?\s*[kKmM]?(?:\s*(?:-|–|—|to)\s*\$?\s*[\d,]+(?:\.\d+)?\s*[kKmM]?)?)\s*(?:usd\s*)?(?:annual|annually|per year|/year|/yr)?"),
-            (12, r"compensation[^\d]{0,80}(\$?\s*[\d,]+(?:\.\d+)?\s*[kKmM]?(?:\s*(?:-|–|—|to)\s*\$?\s*[\d,]+(?:\.\d+)?\s*[kKmM]?)?)"),
-            (2, r"equity[:\s]+(\$?\s*[\d,]+(?:\.\d+)?\s*[kKmM]?(?:\s*(?:-|–|—|to)\s*\$?\s*[\d,]+(?:\.\d+)?\s*[kKmM]?)?)"),
+            (16, r"Compensation Range:\s*(\$?\s*[\d,]+(?:\.\d+)?(?:\s*[kKmM](?![a-zA-Z]))?(?:\s*(?:-|–|—|to)\s*\$?\s*[\d,]+(?:\.\d+)?(?:\s*[kKmM](?![a-zA-Z]))?)?)"),
+            (15, r"estimated annual pay range[^\d]{0,80}(\$?\s*[\d,]+(?:\.\d+)?(?:\s*[kKmM](?![a-zA-Z]))?(?:\s*(?:-|–|—|to)\s*\$?\s*[\d,]+(?:\.\d+)?(?:\s*[kKmM](?![a-zA-Z]))?)?)"),
+            (15, r"annual pay range[^\d]{0,80}(\$?\s*[\d,]+(?:\.\d+)?(?:\s*[kKmM](?![a-zA-Z]))?(?:\s*(?:-|–|—|to)\s*\$?\s*[\d,]+(?:\.\d+)?(?:\s*[kKmM](?![a-zA-Z]))?)?)"),
+            (15, r"pay range for this position[^\d]{0,80}(\$?\s*[\d,]+(?:\.\d+)?(?:\s*[kKmM](?![a-zA-Z]))?(?:\s*(?:-|–|—|to)\s*\$?\s*[\d,]+(?:\.\d+)?(?:\s*[kKmM](?![a-zA-Z]))?)?)"),
+            (14, r"salary range[^\d]{0,80}(\$?\s*[\d,]+(?:\.\d+)?(?:\s*[kKmM](?![a-zA-Z]))?(?:\s*(?:-|–|—|to)\s*\$?\s*[\d,]+(?:\.\d+)?(?:\s*[kKmM](?![a-zA-Z]))?)?)\s*(?:usd\s*)?(?:annual|annually|per year|/year|/yr)?"),
+            (12, r"compensation[^\d]{0,80}(\$?\s*[\d,]+(?:\.\d+)?(?:\s*[kKmM](?![a-zA-Z]))?(?:\s*(?:-|–|—|to)\s*\$?\s*[\d,]+(?:\.\d+)?(?:\s*[kKmM](?![a-zA-Z]))?)?)"),
+            (2, r"equity[:\s]+(\$?\s*[\d,]+(?:\.\d+)?(?:\s*[kKmM](?![a-zA-Z]))?(?:\s*(?:-|–|—|to)\s*\$?\s*[\d,]+(?:\.\d+)?(?:\s*[kKmM](?![a-zA-Z]))?)?)"),
         ]
 
         hourly_patterns = [
