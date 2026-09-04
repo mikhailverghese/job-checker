@@ -28,7 +28,8 @@
     "title_positive": {},
     "title_negative": {
       "snowflake": -5,
-      "software": -5
+      "software": -5,
+      "data engineer": -3
     },
     "location_positive": {
       "piscataway": 3,
