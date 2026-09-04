@@ -61,6 +61,12 @@
       "dax": -3,
       "typescript": -3,
       "javascript": -3,
+      "dataflow": -3,
+      "data form": -3,
+      "dataform": -3,
+      "funnel analysis": -3,
+      "cohort analysis": -3,
+      "retention analysis": -3,
       "statistical": -2,
       "forecast": -2,
       "regression": -2,
@@ -68,6 +74,7 @@
       "machine learning": -2,
       "clinical": -2,
       "healthcare": -2,
+      "a/b test": -2,
       "beaconfire": -12
     }
   },
